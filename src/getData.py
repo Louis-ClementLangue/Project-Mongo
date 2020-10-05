@@ -7,6 +7,7 @@ def get_vlille():
     response = requests.request("GET", url)
 
     response_json = json.loads(response.text.encode('utf8'))
+    #select  record part of  object
     return response_json.get("records", [])
 
 
