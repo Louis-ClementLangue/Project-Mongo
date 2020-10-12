@@ -16,8 +16,26 @@ def get_vparis():
     return response_json.get("records", [])
 
 
+def get_vlyon():
+    url = "https://download.data.grandlyon.com/ws/rdata/jcd_jcdecaux.jcdvelov/all.json?maxfeatures=500&start=1"
+    response = requests.request("GET", url)
+    response_json = json.loads(response.text.encode('utf8'))
+    return response_json.get("values", [])
+
+
+def get_vrennes():
+    url = "https://data.rennesmetropole.fr/api/records/1.0/search/?dataset=etat-des-stations-le-velo-star-en-temps-reel&q=&facet=nom&facet=etat&facet=nombreemplacementsactuels&facet=nombreemplacementsdisponibles&facet=nombrevelosdisponibles"
+    response = requests.request("GET", url)
+    response_json = json.loads(response.text.encode('utf8'))
+    return response_json
+
+
 if __name__ == '__main__':
     vlille_data = get_vlille()
     vparis_data = get_vparis()
+    vlyon_data = get_vlyon()
+    vrennes_data = get_vrennes()
     print(vlille_data)
     print(vparis_data)
+    print(vlyon_data)
+    print(vrennes_data)
