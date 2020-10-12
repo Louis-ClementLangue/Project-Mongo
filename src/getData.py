@@ -33,12 +33,11 @@ def get_vrennes():
     response_json = json.loads(response.text.encode('utf8'))
     return response_json
 
+
 # Question 2
 
 def update_db():
-    client = pymongo.MongoClient(
-        "mongodb+srv://" + dbi.db_user + ":" + dbi.db_password +
-        "@cluster0.yxfmb.gcp.mongodb.net/" + dbi.db_name + "?retryWrites=true&w=majority")
+    client = pymongo.MongoClient("mongodb+srv://" + dbi.db_user + ":" + dbi.db_password + "@cluster0.xkzk9.gcp.mongodb.net/" + dbi.db_name + "?retryWrites=true&w=majority")
 
     db = client.bikeAvailable
 
