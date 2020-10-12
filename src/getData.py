@@ -93,12 +93,14 @@ def prepare_data(lille_data, paris_data, lyon_data, rennes_data):
 # Question 2
 
 def update_db():
-    client = pymongo.MongoClient("mongodb+srv://db_User:djshbfcvedv@cluster0.xkzk9.gcp.mongodb.net/bikeAvailable?retryWrites=true&w=majority")
+    client = pymongo.MongoClient("mongodb+srv://dbUser:djshbfcvedv@cluster0.xkzk9.gcp.mongodb.net/bikeAvailable?retryWrites=true&w=majority")
 
     db = client.bikeAvailable
+    bikeAvailable = db.bikeAvailable
 
     print("Connection succeed")
-
+    bikeAvailable.insert_many(stations_data)
+    print("data stored successfully")
 
 if __name__ == '__main__':
     vlille_data = get_vlille()
