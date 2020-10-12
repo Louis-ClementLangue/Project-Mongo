@@ -33,8 +33,62 @@ def get_vrennes():
     url = "https://data.rennesmetropole.fr/api/records/1.0/search/?dataset=etat-des-stations-le-velo-star-en-temps-reel&q=&facet=nom&facet=etat&facet=nombreemplacementsactuels&facet=nombreemplacementsdisponibles&facet=nombrevelosdisponibles"
     response = requests.request("GET", url)
     response_json = json.loads(response.text.encode('utf8'))
-    return response_json
+    return response_json.get("records", [])
 
+
+def prepare_data(lille_data, paris_data, lyon_data, rennes_data):
+    data = []
+    for i in lille_data:
+        data.append({
+            "name": i["fields"]["nom"],
+            "city": "Lille",
+            "size": i["fields"]["nbvelosdispo"] + i["fields"]["nbplacesdispo"],
+            "geo": i["geometry"],
+            "TPE": i["fields"]["type"] == "AVEC TPE",
+            "status": i["fields"]["etat"] == "EN SERVICE",
+            "last update": i["fields"]["datemiseajour"]
+        })
+
+    for j in paris_data:
+        data.append({
+            "name": j["fields"]["name"],
+            "city": "Paris",
+            "size": j["fields"]["capacity"],
+            "geo": j["geometry"],
+            "TPE": j["fields"]["is_renting"] == "OUI",
+            "status": j["fields"]["is_installed"] == "OUI",
+            "last update": j["fields"]["duedate"]
+        })
+
+    for k in lyon_data:
+        data.append({
+            "name": k["name"],
+            "city": "Lyon",
+            "size": k["bike_stands"],
+            "geo": {
+                "type": "Point",
+                "coordinates": [
+                    k["lng"],
+                    k["lat"]
+                ]
+            },
+            "TPE": k["banking"],
+            "status": k["status"] == "OPEN",
+            "last update": k["last_update_fme"]
+        })
+
+    for l in rennes_data:
+        data.append({
+            "name": l["fields"]["nom"],
+            "city": "Rennes",
+            "size": l["fields"]["nombreemplacementsactuels"],
+            "geo": l["geometry"],
+            "TPE": False,
+            "status": l["fields"]["etat"] == "En fonctionnement",
+            "last update": l["fields"]["lastupdate"]
+        })
+
+    return data
 
 # Question 2
 
@@ -51,8 +105,6 @@ if __name__ == '__main__':
     vparis_data = get_vparis()
     vlyon_data = get_vlyon()
     vrennes_data = get_vrennes()
-    print(vlille_data)
-    print(vparis_data)
-    print(vlyon_data)
-    print(vrennes_data)
+    stations_data = prepare_data(vlille_data, vparis_data, vlyon_data, vrennes_data)
+    print(stations_data)
     update_db()
