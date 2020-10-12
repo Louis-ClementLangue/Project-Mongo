@@ -1,5 +1,8 @@
+import pymongo as pymongo
 import requests
 import json
+
+# Question 1
 
 
 def get_vlille():
@@ -28,6 +31,23 @@ def get_vrennes():
     response = requests.request("GET", url)
     response_json = json.loads(response.text.encode('utf8'))
     return response_json
+
+# Question 2
+
+def update_db():
+    client = pymongo.MongoClient(
+        "mongodb+srv://" + dbi.db_user + ":" + dbi.db_password +
+        "@cluster0.yxfmb.gcp.mongodb.net/" + dbi.db_name + "?retryWrites=true&w=majority")
+
+    db = client.vls
+    refresh_stations = p1.get_stations(city)
+
+    for sta in refresh_stations:
+        db.stations.update_one({
+            "name": sta["name"]
+        }, {
+            "$set": sta
+        }, upsert=True)  # Add the data if not found
 
 
 if __name__ == '__main__':
