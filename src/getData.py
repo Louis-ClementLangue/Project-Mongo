@@ -1,6 +1,8 @@
 import pymongo as pymongo
 import requests
 import json
+from src import dbi
+
 
 # Question 1
 from src import dbi
@@ -37,9 +39,11 @@ def get_vrennes():
 # Question 2
 
 def update_db():
-    client = pymongo.MongoClient("mongodb+srv://" + dbi.db_user + ":" + dbi.db_password + "@cluster0.xkzk9.gcp.mongodb.net/" + dbi.db_name + "?retryWrites=true&w=majority")
+    client = pymongo.MongoClient("mongodb+srv://db_User:djshbfcvedv@cluster0.xkzk9.gcp.mongodb.net/bikeAvailable?retryWrites=true&w=majority")
 
     db = client.bikeAvailable
+
+    print("Connection succeed")
 
 
 if __name__ == '__main__':
