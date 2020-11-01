@@ -97,10 +97,37 @@ def update_db():
 
     db = client.bikeAvailable
     bikeAvailable = db.bikeAvailable
-
+    bikeAvailable.create_index([("geometry", "2dsphere")])
     print("Connection succeed")
     bikeAvailable.insert_many(stations_data)
     print("data stored successfully")
+
+
+#Question 3
+
+
+
+def closest_station(lat, lon):
+    client = pymongo.MongoClient(
+        "mongodb+srv://dbUser:djshbfcvedv@cluster0.xkzk9.gcp.mongodb.net/bikeAvailable?retryWrites=true&w=majority")
+    db = client.bikeAvailable
+    bikeAvailable = db.bikeAvailable
+    close_stations = bikeAvailable.find({
+        'geometry': {
+            '$near': {
+                '$geometry': {
+                    'type': "Point",
+                    'coordinates': [lon, lat]},
+                    '$minDistance': 0,
+                    '$maxDistance': 500
+                }
+            }
+        })
+    for s in close_stations:
+        print(s)
+
+
+
 
 if __name__ == '__main__':
     vlille_data = get_vlille()
@@ -110,3 +137,7 @@ if __name__ == '__main__':
     stations_data = prepare_data(vlille_data, vparis_data, vlyon_data, vrennes_data)
     print(stations_data)
     update_db()
+    lat = 45.77589951121384#float(input("Enter latitude : "))
+    lon = 4.82537896207112#float(input("Enter longitude : "))
+    closest_station(lat, lon)
+
