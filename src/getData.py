@@ -43,7 +43,13 @@ def prepare_data(lille_data, paris_data, lyon_data, rennes_data):
             "name": i["fields"]["nom"],
             "city": "Lille",
             "size": i["fields"]["nbvelosdispo"] + i["fields"]["nbplacesdispo"],
-            "geo": i["geometry"],
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    i["fields"]["localisation"][1],
+                    i["fields"]["localisation"][0]
+                ]
+            },
             "TPE": i["fields"]["type"] == "AVEC TPE",
             "status": i["fields"]["etat"] == "EN SERVICE",
             "last update": i["fields"]["datemiseajour"]
@@ -54,7 +60,13 @@ def prepare_data(lille_data, paris_data, lyon_data, rennes_data):
             "name": j["fields"]["name"],
             "city": "Paris",
             "size": j["fields"]["capacity"],
-            "geo": j["geometry"],
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    j["fields"]["coordonnees_geo"][1],
+                    j["fields"]["coordonnees_geo"][0]
+                ]
+            },
             "TPE": j["fields"]["is_renting"] == "OUI",
             "status": j["fields"]["is_installed"] == "OUI",
             "last update": j["fields"]["duedate"]
@@ -65,7 +77,7 @@ def prepare_data(lille_data, paris_data, lyon_data, rennes_data):
             "name": k["name"],
             "city": "Lyon",
             "size": k["bike_stands"],
-            "geo": {
+            "geometry": {
                 "type": "Point",
                 "coordinates": [
                     k["lng"],
@@ -82,7 +94,13 @@ def prepare_data(lille_data, paris_data, lyon_data, rennes_data):
             "name": l["fields"]["nom"],
             "city": "Rennes",
             "size": l["fields"]["nombreemplacementsactuels"],
-            "geo": l["geometry"],
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    l["fields"]["coordonnees"][1],
+                    l["fields"]["coordonnees"][0]
+                ]
+            },
             "TPE": False,
             "status": l["fields"]["etat"] == "En fonctionnement",
             "last update": l["fields"]["lastupdate"]
@@ -101,6 +119,8 @@ def update_db():
     print("Connection succeed")
     bikeAvailable.insert_many(stations_data)
     print("data stored successfully")
+    client.bikeAvailable.stations.create_index([("geometry", "2dsphere")])
+    client.bikeAvailable.stations.insert_many(stations_data)
 
 
 #Question 3
@@ -123,7 +143,9 @@ def closest_station(lat, lon):
                 }
             }
         })
+    last_stations = []
     for s in close_stations:
+        last_stations.append(s['name'])
         print(s)
 
 
@@ -137,7 +159,7 @@ if __name__ == '__main__':
     stations_data = prepare_data(vlille_data, vparis_data, vlyon_data, vrennes_data)
     print(stations_data)
     update_db()
-    lat = 45.77589951121384#float(input("Enter latitude : "))
-    lon = 4.82537896207112#float(input("Enter longitude : "))
+    lat = 45.77589951121384
+    lon = 4.82537896207112
     closest_station(lat, lon)
 
